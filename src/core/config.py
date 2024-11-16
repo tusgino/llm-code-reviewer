@@ -9,7 +9,7 @@ class Config:
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
     OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
     ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
-    ANTHROPIC_MODEL = os.environ.get('ANTHROPIC_MODEL', 'claude-3-5-sonnet-latest')
+    ANTHROPIC_MODEL = os.environ.get('ANTHROPIC_MODEL', 'claude-3-5-sonnet-20241022')
 
     _raw_language: str = os.environ.get('HUMAN_LANGUAGE', 'en')
     HUMAN_LANGUAGE = LanguageValidator.validate_language(_raw_language)

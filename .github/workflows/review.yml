@@ -24,21 +24,21 @@ jobs:
             requirements.txt
 
       - name: Cache pip packages
-      uses: actions/cache@v4
-      id: pip-cache
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        uses: actions/cache@v4
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
           
       - name: Install dependencies
-      shell: bash
-      run: |
-        python -m pip install --upgrade pip
-        if [ "${{ steps.pip-cache.outputs.cache-hit }}" != 'true' ]; then
-          pip install -r requirements.txt
-        fi
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          if [ "${{ steps.pip-cache.outputs.cache-hit }}" != 'true' ]; then
+            pip install -r requirements.txt
+          fi
           
       - name: Run LLM AI Code Reviewer
         env:
@@ -47,7 +47,9 @@ jobs:
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
-          HUMAN_LANGUAGE: 'vi'
-          PRIMARY_MODEL: 'openai'
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          HUMAN_LANGUAGE: ${{ vars.HUMAN_LANGUAGE }}
+          PRIMARY_MODEL: ${{ vars.PRIMARY_MODEL }}
         run: |
           python3.10 -m src.main src/main.py
