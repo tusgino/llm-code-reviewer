@@ -1,5 +1,4 @@
 name: Gemini AI Code Reviewer
-
 on:
   issue_comment:
     types: [created]
@@ -9,31 +8,32 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/tool-review')
+      contains(github.event.comment.body, '/tool-review') &&
+      github.event.pull_request.base.ref == 'develop' &&
+      contains(github.event.repository.codeowners, github.event.comment.user.login)
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
+          
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
+          
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-
+          
       - name: Run LLM AI Code Reviewer
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ variables.GEMINI_MODEL }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ variables.OPENAI_MODEL }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
           HUMAN_LANGUAGE: 'vi'
-          # can use 'gemini' or 'openai' or 'anthropic' as primary model
           PRIMARY_MODEL: 'openai'
         run: |
           python3.10 -m src.main src/main.py
