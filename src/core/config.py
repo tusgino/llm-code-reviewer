@@ -13,6 +13,7 @@ class Config:
 
     _raw_language: str = os.environ.get('HUMAN_LANGUAGE', 'en')
     HUMAN_LANGUAGE = LanguageValidator.validate_language(_raw_language)
+    PRIMARY_MODEL = os.environ.get('PRIMARY_MODEL', 'gemini')
     
     @classmethod
     def initialize_clients(cls):

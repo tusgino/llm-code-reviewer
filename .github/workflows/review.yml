@@ -28,7 +28,11 @@ jobs:
       - name: Run LLM AI Code Reviewer
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: 'gemini-1.5-flash-002'
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: 'gpt-4o-mini'
           HUMAN_LANGUAGE: 'vi'
+          # can use 'gemini' or 'openai' or 'anthropic' as primary model
+          PRIMARY_MODEL: 'openai'
         run: |
           python3.10 -m src.main src/main.py

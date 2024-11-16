@@ -19,38 +19,45 @@ class AIService:
         self._initialize_service()
 
     def _initialize_service(self) -> None:
-        """
-        Initialize the appropriate LLM service based on available API keys.
-        Prioritizes Gemini over OpenAI if both are available.
-        """
-        try:
-            if hasattr(Config, 'GEMINI_API_KEY') and Config.GEMINI_API_KEY:
-                self.active_service = GeminiService()
-                print("Initialized Gemini service")
-                return
-        except Exception as e:
-            print(f"Failed to initialize Gemini service: {e}")
+        """Initialize the appropriate LLM service based on available API keys."""
+        PRIMARY_MODEL = getattr(Config, 'PRIMARY_MODEL', 'gemini').lower()
+        SUPPORTED_MODELS = {
+            'gemini': GeminiService,
+            'openai': OpenAIService,
+            'anthropic': AnthropicService
+        }
 
-        try:
-            if hasattr(Config, 'OPENAI_API_KEY') and Config.OPENAI_API_KEY:
-                self.active_service = OpenAIService()
-                print("Initialized OpenAI service")
-                return
-        except Exception as e:
-            print(f"Failed to initialize OpenAI service: {e}")
+        if PRIMARY_MODEL not in SUPPORTED_MODELS:
+            print(f"Unsupported PRIMARY_MODEL '{PRIMARY_MODEL}'. Using default order.")
+            ordered_models = list(SUPPORTED_MODELS.keys())
+        else:
+            ordered_models = [PRIMARY_MODEL] + [
+                model for model in SUPPORTED_MODELS if model != PRIMARY_MODEL
+            ]
 
-        try:
-            if hasattr(Config, 'ANTHROPIC_API_KEY') and Config.ANTHROPIC_API_KEY:
-                self.active_service = AnthropicService()
-                print("Initialized Anthropic service")
-                return
-        except Exception as e:
-            print(f"Failed to initialize Anthropic service: {e}")
+        for model in ordered_models:
+            if self.check_key_model_availability(model):
+                try:
+                    self.active_service = SUPPORTED_MODELS[model]()
+                    print(f"Initialized {model.title()} service")
+                    break
+                except Exception as e:
+                    print(f"Failed to initialize {model.title()} service: {e}")
 
         if not self.active_service:
-            raise ValueError(
-                "No LLM service could be initialized. Please check your API keys in the configuration."
-            )
+            raise ValueError("No LLM service could be initialized. Please check your API keys.")
+
+    def check_key_model_availability(self, model: str) -> bool:
+        """Check if the API key for specified model is available.
+
+        Args:
+            model: Service name ('openai', 'gemini', or 'anthropic')
+
+        Returns:
+            bool: True if API key is available
+        """
+        key_name = f"{model.upper()}_API_KEY"
+        return hasattr(Config, key_name) and getattr(Config, key_name)
 
     def create_prompt(self, file: PatchedFile, hunk: Hunk, pr_details: PRDetails) -> str:
         """
