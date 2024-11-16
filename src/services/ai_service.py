@@ -1,9 +1,11 @@
 from typing import List, Dict
 from unidiff import Hunk, PatchedFile
+
 from ..core.config import Config
 from ..core.models import PRDetails
 from .llms.gemini import GeminiService
 from .llms.openai import OpenAIService
+from .llms.anthropic import AnthropicService
 
 class AIService:
     """
@@ -33,6 +35,14 @@ class AIService:
             if hasattr(Config, 'OPENAI_API_KEY') and Config.OPENAI_API_KEY:
                 self.active_service = OpenAIService()
                 print("Initialized OpenAI service")
+                return
+        except Exception as e:
+            print(f"Failed to initialize OpenAI service: {e}")
+
+        try:
+            if hasattr(Config, 'ANTHROPIC_API_KEY') and Config.ANTHROPIC_API_KEY:
+                self.active_service = AnthropicService()
+                print("Initialized Anthropic service")
                 return
         except Exception as e:
             print(f"Failed to initialize OpenAI service: {e}")

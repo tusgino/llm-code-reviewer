@@ -28,6 +28,7 @@ class GeminiService(BaseLLMService):
         Review the following code diff in the file "{file.path}" and take the pull request title and description into account.
         Pull request title: {pr_details.title}
         Pull request description:
+        Please your review in {Config.HUMAN_LANGUAGE} language.
 
         ---
         {pr_details.description or 'No description provided'}
