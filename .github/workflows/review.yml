@@ -5,7 +5,7 @@ on:
     types: [created]
 permissions: write-all
 jobs:
-  gemini-code-review:
+  review:
     runs-on: ubuntu-latest
     if: |
       github.event.issue.pull_request &&
