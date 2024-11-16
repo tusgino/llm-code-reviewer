@@ -45,7 +45,7 @@ class AIService:
                 print("Initialized Anthropic service")
                 return
         except Exception as e:
-            print(f"Failed to initialize OpenAI service: {e}")
+            print(f"Failed to initialize Anthropic service: {e}")
 
         if not self.active_service:
             raise ValueError(

@@ -17,10 +17,7 @@ class AnthropicService(BaseLLMService):
         
     def create_prompt(self, file: PatchedFile, hunk: Hunk, pr_details: PRDetails) -> str:
         """Create a prompt formatted for Anthropic's model expectations."""
-        review_prompt = Config.LANGUAGE_PROMPTS.get(Config.HUMAN_LANGUAGE, Config.LANGUAGE_PROMPTS['en'])
-        
-        return f"""{review_prompt}
-
+        return f"""
         Your task is to review the following code changes. Please follow these guidelines:
         
         - Provide your response in this JSON format:
