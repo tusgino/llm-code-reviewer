@@ -23,6 +23,7 @@ class OpenAIService(BaseLLMService):
         - Use GitHub Markdown in comments
         - Focus on bugs, security issues, and performance problems
         - IMPORTANT: NEVER suggest adding comments to the code
+        - Comment with language of human: {Config.HUMAN_LANGUAGE}
 
         Review the following code diff in the file "{file.path}" and take the pull request title and description into account.
         Pull request title: {pr_details.title}

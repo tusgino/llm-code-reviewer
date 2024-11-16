@@ -7,6 +7,7 @@ class Config:
     GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-1.5-flash-002')
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
     OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
+    HUMAN_LANGUAGE = os.environ.get('HUMAN_LANGUAGE', 'en')
     
     @classmethod
     def initialize_clients(cls):
