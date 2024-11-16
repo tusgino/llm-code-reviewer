@@ -1,0 +1,48 @@
+name: "LLM Code Reviewer"
+description: "This GitHub Action automatically reviews PRs using multiple model."
+author: 'tusgino'
+
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub token to interact with the repository'
+    required: true
+  GEMINI_API_KEY:
+    description: 'Google Gemini API key'
+    required: false
+  OPENAI_API_KEY:
+    description: 'OpenAI API key'
+    required: false
+  GEMINI_MODEL:
+    description: 'The Gemini model to use for code review'
+    required: false
+    default: 'gemini-1.5-flash-002'
+  OPENAI_MODEL:
+    description: 'The OpenAI model to use for code review'
+    required: false
+    default: 'gpt-4o-mini'
+  INPUT_EXCLUDE:
+    description: 'Comma-separated list of file patterns to exclude'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run code review
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        GEMINI_API_KEY: ${{ inputs.GEMINI_API_KEY }}
+        INPUT_EXCLUDE: ${{ inputs.EXCLUDE }}
+      run: python ${{ github.action_path }}/main.py
