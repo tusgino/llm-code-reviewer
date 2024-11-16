@@ -1,66 +1,89 @@
-import json
-from typing import List, Dict, Any, Optional
-import google.generativeai as Client
+from typing import List, Dict
 from unidiff import Hunk, PatchedFile
 from ..core.config import Config
-from ..core.models import PRDetails, FileInfo
-
+from ..core.models import PRDetails
+from .llms.gemini import GeminiService
+from .llms.openai import OpenAIService
 
 class AIService:
-  def __init__(self):
-    self.model = Client.GenerativeModel(Config.GEMINI_MODEL)
-
-  def create_prompt(
-    self, file: PatchedFile, hunk: Hunk, pr_details: PRDetails
-  ) -> str:
-    return f"""Your task is reviewing pull requests. Instructions:
-    - Provide the response in following JSON format: {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>"}}]}}
-    - Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
-    - Use GitHub Markdown in comments
-    - Focus on bugs, security issues, and performance problems
-    - IMPORTANT: NEVER suggest adding comments to the code
-
-    Review the following code diff in the file "{file.path}" and take the pull request title and description into account.
-    Pull request title: {pr_details.title}
-    Pull request description:
-
-    ---
-    {pr_details.description or 'No description provided'}
-    ---
-
-    Git diff to review:
-
-    ```diff
-    {hunk.content}
-    ```
     """
+    Service manager that handles selection and usage of available LLM services.
+    Prioritizes Gemini if both services are available.
+    """
+    
+    def __init__(self):
+        """Initialize available LLM services based on configuration."""
+        self.active_service = None
+        self._initialize_service()
 
-  def get_ai_response(self, prompt: str) -> List[Dict[str, str]]:
-    try:
-      response = self.model.generate_content(prompt)
-      response_text = self._clean_response_text(response.text)
-      return self._parse_response(response_text)
-    except Exception as e:
-      print(f"Error during Gemini API call: {e}")
-      return []
+    def _initialize_service(self) -> None:
+        """
+        Initialize the appropriate LLM service based on available API keys.
+        Prioritizes Gemini over OpenAI if both are available.
+        """
+        try:
+            if hasattr(Config, 'GEMINI_API_KEY') and Config.GEMINI_API_KEY:
+                self.active_service = GeminiService()
+                print("Initialized Gemini service")
+                return
+        except Exception as e:
+            print(f"Failed to initialize Gemini service: {e}")
 
-  def _clean_response_text(self, text: str) -> str:
-    text = text.strip()
-    if text.startswith('```json'):
-      text = text[7:]
-    if text.endswith('```'):
-      text = text[:-3]
-    return text.strip()
+        try:
+            if hasattr(Config, 'OPENAI_API_KEY') and Config.OPENAI_API_KEY:
+                self.active_service = OpenAIService()
+                print("Initialized OpenAI service")
+                return
+        except Exception as e:
+            print(f"Failed to initialize OpenAI service: {e}")
 
-  def _parse_response(self, response_text: str) -> List[Dict[str, str]]:
-    try:
-      data = json.loads(response_text)
-      if "reviews" in data and isinstance(data["reviews"], list):
-        return [
-          review
-          for review in data["reviews"]
-          if "lineNumber" in review and "reviewComment" in review
-        ]
-      return []
-    except json.JSONDecodeError:
-      return []
+        if not self.active_service:
+            raise ValueError(
+                "No LLM service could be initialized. Please check your API keys in the configuration."
+            )
+
+    def create_prompt(self, file: PatchedFile, hunk: Hunk, pr_details: PRDetails) -> str:
+        """
+        Create a prompt using the active LLM service.
+        
+        Args:
+            file: The file being reviewed
+            hunk: The code hunk to review
+            pr_details: Pull request details
+            
+        Returns:
+            str: Formatted prompt for the active LLM service
+        """
+        if not self.active_service:
+            raise RuntimeError("No active LLM service available")
+        return self.active_service.create_prompt(file, hunk, pr_details)
+
+    def get_ai_response(self, prompt: str) -> List[Dict[str, str]]:
+        """
+        Get response from the active LLM service.
+        
+        Args:
+            prompt: The formatted prompt to send to the LLM
+            
+        Returns:
+            List[Dict[str, str]]: List of review comments
+        """
+        if not self.active_service:
+            raise RuntimeError("No active LLM service available")
+            
+        try:
+            return self.active_service.get_ai_response(prompt)
+        except Exception as e:
+            print(f"Error getting AI response: {e}")
+            return []
+
+    def get_active_service_name(self) -> str:
+        """
+        Get the name of the currently active service.
+        
+        Returns:
+            str: Name of the active service or 'None' if no service is active
+        """
+        if not self.active_service:
+            return "None"
+        return self.active_service.__class__.__name__
