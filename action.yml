@@ -81,7 +81,7 @@ runs:
       run: |
         MAIN_PY_PATH="$GITHUB_ACTION_PATH/src/main.py"
         if [ -f "$MAIN_PY_PATH" ]; then
-          python "$MAIN_PY_PATH"
+          python3.10 -m src.main "$MAIN_PY_PATH"
         else
           echo "Error: main.py not found in $GITHUB_ACTION_PATH/src/"
           exit 1
