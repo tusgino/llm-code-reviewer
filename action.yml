@@ -44,5 +44,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         GEMINI_API_KEY: ${{ inputs.GEMINI_API_KEY }}
-        INPUT_EXCLUDE: ${{ inputs.EXCLUDE }}
-      run: python ${{ github.action_path }}/main.py
+        OPENAI_API_KEY: ${{ inputs.OPENAI_API_KEY }}
+        GEMINI_MODEL: ${{ inputs.GEMINI_MODEL }}
+        OPENAI_MODEL: ${{ inputs.OPENAI_MODEL }}
+        INPUT_EXCLUDE: ${{ inputs.INPUT_EXCLUDE }}
+      run: python -m src.main ${{ github.action_path }}/src/main.py

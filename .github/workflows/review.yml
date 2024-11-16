@@ -5,7 +5,7 @@ on:
     types: [created]
 permissions: write-all
 jobs:
-  gemini-code-review:
+  review:
     runs-on: ubuntu-latest
     if: |
       github.event.issue.pull_request &&
@@ -30,4 +30,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ACCESS_GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          python3.10 main.py
+          python3.10 -m src.main src/main.py
