@@ -24,6 +24,11 @@ inputs:
     description: 'Comma-separated list of file patterns to exclude'
     required: false
     default: ''
+  HUMAN_LANGUAGE:
+    description: 'The human language to use for code review'
+    required: false
+    default: 'en'
+
 runs:
   using: 'composite'
   steps:
@@ -48,4 +53,5 @@ runs:
         GEMINI_MODEL: ${{ inputs.GEMINI_MODEL }}
         OPENAI_MODEL: ${{ inputs.OPENAI_MODEL }}
         INPUT_EXCLUDE: ${{ inputs.INPUT_EXCLUDE }}
+        HUMAN_LANGUAGE: ${{ inputs.HUMAN_LANGUAGE }}
       run: python3.10 -m src.main ${{ github.action_path }}/src/main.py

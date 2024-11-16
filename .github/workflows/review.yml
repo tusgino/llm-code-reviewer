@@ -29,5 +29,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HUMAN_LANGUAGE: 'vi'
         run: |
           python3.10 -m src.main src/main.py
