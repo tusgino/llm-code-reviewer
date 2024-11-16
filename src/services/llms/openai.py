@@ -24,8 +24,7 @@ class OpenAIService(BaseLLMService):
         - Use GitHub Markdown in comments
         - Focus on bugs, security issues, and performance problems
         - IMPORTANT: NEVER suggest adding comments to the code
-
-        Please provide your review in {Config.HUMAN_LANGUAGE} language.
+        - IMPORTANT: Provide your review in {Config.HUMAN_LANGUAGE} language.
 
         Review the following code diff in the file "{file.path}" and take the pull request title and description into account.
         Pull request title: {pr_details.title}
@@ -48,7 +47,7 @@ class OpenAIService(BaseLLMService):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a code review assistant."},
+                    {"role": "system", "content": "You are an expert code reviewer."},
                     {"role": "user", "content": prompt}
                 ]
             )

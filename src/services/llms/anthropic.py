@@ -31,8 +31,7 @@ class AnthropicService(BaseLLMService):
           * Security vulnerabilities
           * Performance issues
           * Code structure and maintainability
-        
-        Please provide your review in {Config.HUMAN_LANGUAGE} language.
+        - IMPORTANT: Provide your review in {Config.HUMAN_LANGUAGE} language
         
         File being reviewed: "{file.path}"
         
@@ -56,7 +55,7 @@ class AnthropicService(BaseLLMService):
                 model=self.model,
                 max_tokens=1024,
                 temperature=0.7,
-                system="You are an expert code reviewer. You provide clear, actionable feedback to improve code quality, security, and performance. You communicate in the specified language while maintaining technical accuracy.",
+                system="You are an expert code reviewer.",
                 messages=[
                     {
                         "role": "user",
