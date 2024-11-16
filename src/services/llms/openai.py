@@ -48,7 +48,7 @@ class OpenAIService(BaseLLMService):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a code review assistant."},
+                    {"role": "system", "content": "You are an expert code reviewer. You provide clear, actionable feedback to improve code quality, security, and performance. You communicate in the specified language while maintaining technical accuracy."},
                     {"role": "user", "content": prompt}
                 ]
             )
