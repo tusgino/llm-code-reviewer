@@ -19,11 +19,13 @@ class OpenAIService(BaseLLMService):
         """Create a prompt formatted for OpenAI's expectations."""
         return f"""Your task is reviewing pull requests. Instructions:
         - Provide the response in following JSON format: {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>"}}]}}
+
         - Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
         - Use GitHub Markdown in comments
         - Focus on bugs, security issues, and performance problems
         - IMPORTANT: NEVER suggest adding comments to the code
-        - Comment with language of human: {Config.HUMAN_LANGUAGE}
+
+        Please provide your review in {Config.HUMAN_LANGUAGE} language.
 
         Review the following code diff in the file "{file.path}" and take the pull request title and description into account.
         Pull request title: {pr_details.title}
