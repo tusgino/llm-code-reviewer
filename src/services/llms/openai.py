@@ -46,6 +46,7 @@ class OpenAIService(BaseLLMService):
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
+                temperature=0.3,
                 messages=[
                     {"role": "system", "content": "You are an expert code reviewer."},
                     {"role": "user", "content": prompt}

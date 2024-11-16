@@ -54,7 +54,7 @@ class AnthropicService(BaseLLMService):
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=1024,
-                temperature=0.7,
+                temperature=0.3,
                 system="You are an expert code reviewer.",
                 messages=[
                     {
