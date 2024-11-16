@@ -48,4 +48,4 @@ runs:
         GEMINI_MODEL: ${{ inputs.GEMINI_MODEL }}
         OPENAI_MODEL: ${{ inputs.OPENAI_MODEL }}
         INPUT_EXCLUDE: ${{ inputs.INPUT_EXCLUDE }}
-      run: python ${{ github.action_path }}/src/main.py
+      run: python3.10 -m src.main ${{ github.action_path }}/src/main.py
