@@ -8,9 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/tool-review') &&
-      github.event.pull_request.base.ref == 'develop' &&
-      contains(github.event.repository.codeowners, github.event.comment.user.login)
+      contains(github.event.comment.body, '/tool-review')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
