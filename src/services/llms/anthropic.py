@@ -21,7 +21,7 @@ class AnthropicService(BaseLLMService):
         Your task is to review the following code changes. Please follow these guidelines:
         
         - Provide your response in this JSON format:
-          {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>"}}]}}
+        {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>"}}]}}
         
         - Only provide comments for code that needs improvement
         - If no improvements are needed, return an empty "reviews" array
