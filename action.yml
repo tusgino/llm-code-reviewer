@@ -28,6 +28,9 @@ inputs:
     description: 'The human language to use for code review'
     required: false
     default: 'en'
+  PRIMARY_MODEL:
+    description: 'The primary model to use for code review'
+    required: false
 
 runs:
   using: 'composite'
@@ -54,4 +57,5 @@ runs:
         OPENAI_MODEL: ${{ inputs.OPENAI_MODEL }}
         INPUT_EXCLUDE: ${{ inputs.INPUT_EXCLUDE }}
         HUMAN_LANGUAGE: ${{ inputs.HUMAN_LANGUAGE }}
+        PRIMARY_MODEL: ${{ inputs.PRIMARY_MODEL }}
       run: python3.10 -m src.main ${{ github.action_path }}/src/main.py
