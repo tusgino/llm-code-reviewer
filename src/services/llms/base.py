@@ -58,22 +58,26 @@ class BaseLLMService(ABC):
 
     def _parse_response(self, response_text: str) -> List[Dict[str, str]]:
         """
-        Parse the cleaned response text into structured data.
+        Parse the cleaned response text into structured review comments.
         
         Args:
-            response_text: Cleaned response text
+            response_text: JSON formatted response text from LLM
             
         Returns:
-            List[Dict[str, str]]: Parsed review comments
+            List[Dict[str, str]]: List of valid review comments containing lineNumber and reviewComment
         """
+        if not response_text:
+            return []
+            
         try:
             data = json.loads(response_text)
-            if "reviews" in data and isinstance(data["reviews"], list):
-                return [
-                review
-                for review in data["reviews"]
-                if "lineNumber" in review and "reviewComment" in review
-                ]
-            return []
+            reviews = data.get("reviews", [])
+            
+            return [
+                review for review in reviews
+                if isinstance(review, dict) 
+                and review.get("lineNumber") 
+                and review.get("reviewComment")
+            ]
         except json.JSONDecodeError:
             return []
