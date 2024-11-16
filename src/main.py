@@ -46,7 +46,7 @@ class PRReviewApplication:
     return [
       file for file in parsed_diff
       if not any(fnmatch.fnmatch(file.get('path', ''), pattern)
-             for pattern in exclude_patterns)
+        for pattern in exclude_patterns)
     ]
 
 if __name__ == "__main__":
