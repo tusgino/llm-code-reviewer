@@ -19,32 +19,43 @@ class AnthropicService(BaseLLMService):
         """Create a prompt formatted for Anthropic's model expectations."""
         return f"""
         Your task is to review the following code changes. Please follow these guidelines:
-        
-        - Provide your response in this JSON format:
-        {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>"}}]}}
-        
-        - Only provide comments for code that needs improvement
-        - If no improvements are needed, return an empty "reviews" array
+        Provide your response in this JSON format:
+        {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>, side: "<left or right >, "filepath": "<file path>"}}]}}
+        Important Rules:
+        1. Line Number Validation:
+        - For "left" side: {hunk.source_start} ≤ lineNumber < {hunk.source_start + hunk.source_length}
+        - For "right" side: {hunk.target_start} ≤ lineNumber < {hunk.target_start + hunk.target_length}
+
+        2. Review Focus Areas:
+        - Critical bugs and errors
+        - Security vulnerabilities and risks
+        - Performance optimization opportunities 
+        - Code architecture and maintainability issues
+        - Suggest code for improvement and optimization
+
+        3. Key Requirements:
+        - Return empty "reviews" array if no issues found
         - Use GitHub Markdown formatting in your comments
-        - Focus on:
-          * Potential bugs
-          * Security vulnerabilities
-          * Performance issues
-          * Code structure and maintainability
-        - IMPORTANT: Provide your review in {Config.HUMAN_LANGUAGE} language
-        
-        File being reviewed: "{file.path}"
-        
-        Pull request title: {pr_details.title}
-        
-        Pull request description:
+        - Do NOT suggest adding code comments
+        - Provide feedback in language: {Config.HUMAN_LANGUAGE}
+
+        Context Information:
+        File: {file.path}
+        PR Title: {pr_details.title}
+        PR Description: 
         ---
         {pr_details.description or 'No description provided'}
         ---
 
-        Code changes to review:
+        Git Diff Details:
+        - Source Start: {hunk.source_start}
+        - Source Length: {hunk.source_length} 
+        - Target Start: {hunk.target_start}
+        - Target Length: {hunk.target_length}
+
+        Code Diff to Review:
         ```diff
-        {hunk.content}
+        {hunk.__str__()}
         ```
         """
 
@@ -54,7 +65,7 @@ class AnthropicService(BaseLLMService):
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=1024,
-                temperature=0.3,
+                temperature=0.2,
                 system="You are an expert code reviewer.",
                 messages=[
                     {
