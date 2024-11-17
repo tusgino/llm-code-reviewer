@@ -30,18 +30,36 @@ name: Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize]    # Trigger on PR open or update
 
 jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - uses: tusgino/llm-code-reviewer@v1
+      - uses: tusgino/review-pr@v1
         with:
+          # Required - GitHub token for PR interactions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Optional configurations
+          
+          # Optional - API keys for different LLM services
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          
+          # Optional - Configure specific model versions
+          GEMINI_MODEL: 'gemini-1.5-flash-002'
+          OPENAI_MODEL: 'gpt-4o-mini'
+          ANTHROPIC_MODEL: 'claude-3-opus-20240229'
+          
+          # Optional - Exclude files from review
+          INPUT_EXCLUDE: '*.md,*.txt'
+          
+          # Optional - Set review language
+          HUMAN_LANGUAGE: 'en'
+          
+          # Optional - Set primary model
+          # Can use 'gemini', 'openai', 'anthropic'
+          PRIMARY_MODEL: 'gemini'
 ```
 
 ## Inputs
@@ -51,32 +69,38 @@ jobs:
 | `GITHUB_TOKEN` | GitHub token for repository interaction | Yes | - |
 | `GEMINI_API_KEY` | Google Gemini API key | No | - |
 | `OPENAI_API_KEY` | OpenAI API key | No | - |
+| `ANTHROPIC_API_KEY` | Anthropic API key | No | - |
 | `GEMINI_MODEL` | Gemini model to use | No | `gemini-1.5-flash-002` |
 | `OPENAI_MODEL` | OpenAI model to use | No | `gpt-4o-mini` |
+| `ANTHROPIC_MODEL` | Anthropic model to use | No | `claude-3-opus-20240229` |
 | `INPUT_EXCLUDE` | Comma-separated file patterns to exclude | No | - |
 | `HUMAN_LANGUAGE` | Language for review comments | No | `en` |
-| `PRIMARY_MODEL` | Primary model for review | No | - |
+| `PRIMARY_MODEL` | Primary model for review (gemini, openai, anthropic) | No | `gemini` |
 
 ## Examples
 
 ### Basic Usage
 
 ```yaml
-- uses: tusgino/llm-code-reviewer@v1
+- uses: tusgino/review-pr@v1
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    PRIMARY_MODEL: 'gemini'
 ```
 
 ### Advanced Configuration
 
 ```yaml
-- uses: tusgino/llm-code-reviewer@v1
+- uses: tusgino/review-pr@v1
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     GEMINI_MODEL: 'gemini-1.5-flash-002'
     OPENAI_MODEL: 'gpt-4o-mini'
+    ANTHROPIC_MODEL: 'claude-3-opus-20240229'
     INPUT_EXCLUDE: '*.md,*.txt'
     HUMAN_LANGUAGE: 'vi'
     PRIMARY_MODEL: 'gemini'
