@@ -1,4 +1,4 @@
-name: Gemini AI Code Reviewer
+name: LLM AI Code Reviewer
 on:
   issue_comment:
     types: [created]

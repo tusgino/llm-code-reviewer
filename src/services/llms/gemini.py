@@ -17,34 +17,52 @@ class GeminiService(BaseLLMService):
         
     def create_prompt(self, file: PatchedFile, hunk: Hunk, pr_details: PRDetails) -> str:
         """Create a prompt formatted for Gemini's expectations."""
-        return f"""Your task is reviewing pull requests. Instructions:
-        - Provide the response in following JSON format: {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>"}}]}}
-        - Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
-        - Use GitHub Markdown in comments
-        - Focus on bugs, security issues, and performance problems
-        - IMPORTANT: NEVER suggest adding comments to the code
-        - Comment with language of human: {Config.HUMAN_LANGUAGE}
+        return f"""
+            Your task is to review the following code changes. Please follow these guidelines:
+            Provide your response in this JSON format:
+            {{"reviews": [{{"lineNumber": <line_number>, "reviewComment": "<review comment>, side: "<left or right >, "filepath": "<file path>"}}]}}
+            Important Rules:
+            1. Line Number Validation:
+            - For "left" side: {hunk.source_start} ≤ lineNumber < {hunk.source_start + hunk.source_length}
+            - For "right" side: {hunk.target_start} ≤ lineNumber < {hunk.target_start + hunk.target_length}
 
-        Review the following code diff in the file "{file.path}" and take the pull request title and description into account.
-        Pull request title: {pr_details.title}
-        Pull request description:
-        Please your review in {Config.HUMAN_LANGUAGE} language.
+            2. Review Focus Areas:
+            - Critical bugs and errors
+            - Security vulnerabilities and risks
+            - Performance optimization opportunities 
+            - Code architecture and maintainability issues
+            - Suggest code for improvement and optimization
 
-        ---
-        {pr_details.description or 'No description provided'}
-        ---
+            3. Key Requirements:
+            - Return empty "reviews" array if no issues found
+            - Use GitHub Markdown formatting in your comments
+            - Do NOT suggest adding code comments
+            - Provide feedback in language: {Config.HUMAN_LANGUAGE}
 
-        Git diff to review:
+            Context Information:
+            File: {file.path}
+            PR Title: {pr_details.title}
+            PR Description: 
+            ---
+            {pr_details.description or 'No description provided'}
+            ---
 
-        ```diff
-        {hunk.content}
-        ```
+            Git Diff Details:
+            - Source Start: {hunk.source_start}
+            - Source Length: {hunk.source_length} 
+            - Target Start: {hunk.target_start}
+            - Target Length: {hunk.target_length}
+
+            Code Diff to Review:
+            ```diff
+            {hunk.__str__()}
+            ```
         """
 
     def get_ai_response(self, prompt: str) -> List[Dict[str, str]]:
         """Get response from Gemini model."""
         try:
-            response = self.model.generate_content(prompt)
+            response = self.model.generate_content(prompt, generation_config={'max_output_tokens': 1024, 'temperature': 0.3})
             response_text = self._clean_response_text(response.text)
             return self._parse_response(response_text)
         except Exception as e:
