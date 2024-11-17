@@ -36,7 +36,7 @@ jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - uses: tusgino/review-pr@v1
+      - uses: tusgino/llm-code-reviewer@v1
         with:
           # Required - GitHub token for PR interactions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
 ### Basic Usage
 
 ```yaml
-- uses: tusgino/review-pr@v1
+- uses: tusgino/llm-code-reviewer@v1
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -92,7 +92,7 @@ jobs:
 ### Advanced Configuration
 
 ```yaml
-- uses: tusgino/review-pr@v1
+- uses: tusgino/llm-code-reviewer@v1
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -135,4 +135,4 @@ Created by [@tusgino](https://github.com/tusgino)
 
 ## Support
 
-If you encounter any issues or have questions, please file them in the [Issues](https://github.com/tusgino/review-pr/issues) section.
+If you encounter any issues or have questions, please file them in the [Issues](https://github.com/tusgino/llm-code-reviewer/issues) section.
